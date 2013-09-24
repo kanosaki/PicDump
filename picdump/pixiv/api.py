@@ -1,6 +1,10 @@
 
 from picdump.webadapter import WebAdapter
 
+
+API_HOST = "spapi.pixiv.net"
+
+
 class API:
     def __init__(self, adapter=None):
         self.adapter = adapter or WebAdapter()
@@ -8,7 +12,9 @@ class API:
         self.search = Search(self)
 
 
+# ---------------------------------
 # Enums
+# ---------------------------------
 class RankingContentType:
     all = 'all'
     original = 'original'
@@ -29,12 +35,14 @@ class SearchMode:
     by_keyword = 's_tc'  # tc = Title and Caption
 
 
+# ---------------------------------
 # Config Facades
+# ---------------------------------
 class Ranking:
     def __init__(self, api):
         self.api = api
 
-    def __call__(self, span=None, content=):
+    def __call__(self, span=None, content=RankingContentType.all):
         pass
 
 

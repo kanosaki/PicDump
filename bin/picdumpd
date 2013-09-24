@@ -1,0 +1,6 @@
+#!/bin/bash
+
+APPROOT=$(dirname $0)/..
+
+cd $APPROOT
+python3 picdump/main.py

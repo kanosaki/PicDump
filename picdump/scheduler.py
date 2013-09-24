@@ -1,5 +1,14 @@
 
-class Updater:
+class Scheduler:
+    pass
+
+
+class Worker:
+    def next_time(self):
+        pass
+
+
+class Updater(Worker):
     """Folder updater"""
     def __init__(self,
                  interval=None,
@@ -9,5 +18,3 @@ class Updater:
         pass
 
 
-class Scheduler:
-    pass
