@@ -1,4 +1,7 @@
-
+test:
+	python -m unittest
+run:
+	./bin/picdumpd
 clean:
 	for d in `find picdump -type d`; do \
 	  case "$$d" in \
