@@ -62,7 +62,7 @@ class TestURLBuilder(unittest.TestCase):
                                  fragment="frg")
         expected = "http://www.example.com/some/path?bar=%20#frg"
         self.assertEqual(str(builder), expected)
-        builder2 = builder.update_with('host', 'www.example2.com')
+        builder2 = builder.update_with(host='www.example2.com')
         expected = "http://www.example2.com/some/path?bar=%20#frg"
         self.assertEqual(str(builder2), expected)
 
@@ -72,8 +72,8 @@ class TestURLBuilder(unittest.TestCase):
                                  path="/some/path",
                                  params={'bar': ' '},
                                  fragment="frg")
-        builder0 = builder.update_with('host', 'www.example.com')
-        builder2 = builder.update_with('host', 'www.example2.com')
+        builder0 = builder.update_with(host='www.example.com')
+        builder2 = builder.update_with(host='www.example2.com')
         self.assertTrue(builder is not builder2)
         self.assertTrue(builder is not builder0)
         self.assertNotEqual(builder, builder2)

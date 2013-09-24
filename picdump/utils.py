@@ -102,11 +102,12 @@ class URLBuilder:
         self._parts = parts
         self._frozen = True
 
-    def update_with(self, key, value):
-        if key not in self.DEFAULT_PARTS:
-            raise ValueError('{} is not allowed'.format(key))
+    def update_with(self, **parts_kw):
+        for k, v in parts_kw.items():
+            if k not in self.DEFAULT_PARTS:
+                raise ValueError('{} is not allowed'.format(k))
         newparts = copy.deepcopy(self._parts)
-        newparts[key] = value
+        newparts.update(parts_kw)
         return type(self)(**newparts)
 
     def __getattr__(self, key):
