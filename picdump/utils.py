@@ -1,6 +1,7 @@
 
 import queue
 import urllib.parse
+import copy
 
 
 # Utility functions
@@ -80,33 +81,41 @@ def with_prefix(prefix, value):
 
 
 class URLBuilder:
-    def __init__(self, scheme='http',
-                 host='',
-                 path='',
-                 params={},
-                 fragment=None):
-        self._path = self._fragment = ''
-        self.scheme = scheme
-        self.host = host
-        self.path = path
-        self.params = params
-        self.fragment = fragment
+    DEFAULT_PARTS = {
+        'scheme': 'http',
+        'host': '',
+        'path': '',
+        'params': {},
+        'fragment': ''
+    }
+    _parts = None
 
-    @property
-    def path(self):
-        return self._path
+    def __init__(self, **parts_kw):
+        object.__setattr__(self, '_frozen', False)
+        for k, v in parts_kw.items():
+            if k not in self.DEFAULT_PARTS:
+                raise ValueError('{} is not allowed'.format(k))
+        parts = copy.deepcopy(self.DEFAULT_PARTS)
+        parts.update(parts_kw)
+        parts['path'] = with_prefix('/', parts['path'])
+        parts['fragment'] = with_prefix('#', parts['fragment'])
+        self._parts = parts
+        self._frozen = True
 
-    @path.setter
-    def path(self, value):
-        self._path = with_prefix('/', value)
+    def update_with(self, key, value):
+        if key not in self.DEFAULT_PARTS:
+            raise ValueError('{} is not allowed'.format(key))
+        newparts = copy.deepcopy(self._parts)
+        newparts[key] = value
+        return type(self)(**newparts)
 
-    @property
-    def fragment(self):
-        return self._fragment
+    def __getattr__(self, key):
+        if key not in self.DEFAULT_PARTS:
+            raise ValueError('{} is not allowed'.format(key))
+        return self._parts[key]
 
-    @fragment.setter
-    def fragment(self, value):
-        self._fragment = with_prefix('#', value)
+    def __hasattr__(self, key):
+        return key in self.DEFAULT_PARTS
 
     @property
     def query(self):
@@ -122,6 +131,19 @@ class URLBuilder:
                                       self.path,
                                       self.query,
                                       self.fragment)
+
+    def copy(self):
+        return copy.deepcopy(self)
+
+    def __eq__(self, other):
+        return str(self) == str(other)
+
+    def __setattr__(self, name, value):
+        if not self._frozen:
+            object.__setattr__(self, name, value)
+        else:
+            raise TypeError('Cannot set name %r on object of type %s' % (
+                            name, self.__class__.__name__))
 
     def to_request(self):
         pass
