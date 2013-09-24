@@ -16,3 +16,4 @@ folders = [
         )
     )
 ]
+# pymode:lint=0
