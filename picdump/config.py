@@ -7,7 +7,7 @@ class ConfigLoader:
     def __init__(self, configfile):
         self.configfile = configfile
 
-    def load(self, path):
+    def load(self):
         locs = {}
         globs = self.prepare_globals()
         exec(self.configfile, globs, locs)
