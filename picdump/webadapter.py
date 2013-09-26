@@ -1,22 +1,12 @@
 
-import urllib.request
+import requests
 
 
 class WebAdapter:
+    def __init__(self):
+        self.cookies = {}
+
     def get(self, urllike):
-        url = self.mk_url(urllike)
-        try:
-            res = urllib.request.urlopen(url)
-            return res.read()
-        except Exception as e:
-            raise e
-
-    def open(self, urllike):
-        url = self.mk_url(urllike)
-        try:
-            return urllib.request.urlopen(url)
-        except Exception as e:
-            raise e
-
-    def mk_url(self, urllike):
-        return str(urllike)
+        res = requests.get(str(urllike), cookies=self.cookies)
+        self.cookies = res.cookies
+        return res.text
