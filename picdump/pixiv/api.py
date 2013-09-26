@@ -95,5 +95,8 @@ class PageFetcher:
     def __next__(self):
         url = self.urlbuilder.update_params(p=self.current_page)
         self.current_page += 1
-        with self.adapter.open(url) as f:
-            return csv.read(f)
+        csv_page = self.adapter.get(url)
+        contents = list(csv.parse(csv_page))
+        if len(contents) == 0:
+            raise StopIteration()
+        return contents
