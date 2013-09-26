@@ -36,14 +36,14 @@ def constant_fn(const):
 class PageIterator:
     def __init__(self, source):
         self.source = source
-        self.queue = queue.Queue()
+        self.queue = queue.deque()
         self.is_source_empty = False
 
     def __next__(self):
         self.prefetch(1)
         try:
-            return self.queue.get_nowait()
-        except queue.Empty:
+            return self.queue.pop()
+        except IndexError:
             raise StopIteration()
 
     def __iter__(self):
@@ -53,7 +53,7 @@ class PageIterator:
         try:
             next_page = next(self.source)
             for item in next_page:
-                self.queue.put(item)
+                self.queue.appendleft(item)
         except StopIteration:
             self.is_source_empty = True
 
@@ -68,9 +68,7 @@ class PageIterator:
 
     @property
     def buffered_size(self):
-        return self.queue.qsize()  # TODO: check validity.
-                                   # qsize method basically returns approximate
-                                   # size
+        return len(self.queue)
 
 
 def with_prefix(prefix, value):

@@ -31,6 +31,10 @@ class TestPageIterator(unittest.TestCase):
         source = iter([])
         pi = utl.PageIterator(source)
         self.assertEqual(list(pi), [])
+        with self.assertRaises(StopIteration):
+            source = iter([])
+            pi = utl.PageIterator(source)
+            next(pi)
 
     def test_full_page_fetching(self):
         pages = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
