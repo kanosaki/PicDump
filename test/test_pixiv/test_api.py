@@ -1,5 +1,6 @@
 
 import unittest
+import io
 
 from picdump.pixiv.api import API, RankingSpan, RankingContentType, SearchMode
 
@@ -7,9 +8,14 @@ from picdump.pixiv.api import API, RankingSpan, RankingContentType, SearchMode
 class DummyAdapter:
     def __init__(self, return_value):
         self.return_value = return_value
+        self.called = False
 
     def get(self, url):
-        return self.return_value
+        if self.called:
+            return ""
+        else:
+            self.called = True
+            return self.return_value
 
 SAMPLE_LINE = '"12345678","1234567","jpg","Title","35","2Q",' + \
     '"http://i1.pixiv.net/img35/img/username/mobile/' + \
@@ -28,3 +34,4 @@ class TestAPI(unittest.TestCase):
         api = API(dummy_adapter)
         result = api.ranking(RankingSpan.daily, RankingContentType.rookie)
         result = list(result)
+        self.assertEqual(1, len(result))
