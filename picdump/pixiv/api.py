@@ -1,5 +1,7 @@
 
 from picdump.webadapter import WebAdapter
+from picdump.utils import URLBuilder, PageIterator
+from picdump.pixiv import csv
 
 
 API_HOST = "spapi.pixiv.net"
@@ -38,17 +40,60 @@ class SearchMode:
 # ---------------------------------
 # Config Facades
 # ---------------------------------
-class Ranking:
+
+class APIFacade:
     def __init__(self, api):
         self.api = api
+        self.urlbuilder = URLBuilder(
+            host=API_HOST,
+            path=self.path
+        )
 
-    def __call__(self, span=None, content=RankingContentType.all):
-        pass
+    @property
+    def path(self):
+        raise NotImplemented()
+
+    def mk_iterator(self, requrl):
+        return PageIterator(PageFetcher(self.api.adapter, requrl))
 
 
-class Search:
-    def __init__(self, api):
-        self.api = api
+class Ranking(APIFacade):
+    path = '/iphone/ranking.php'
 
-    def __call__(self, query=None):
-        pass
+    def __call__(self, span, content=RankingContentType.all):
+        requrl = self.urlbuilder.update_with(
+            params={
+                'mode': span,
+                'content': content
+            }
+        )
+        return self.mk_iterator(requrl)
+
+
+class Search(APIFacade):
+    path = '/iphone/search.php'
+
+    def __call__(self, query, mode=SearchMode.by_tag):
+        requrl = self.urlbuilder.update_with(
+            params={
+                'word': query,
+                's_mode': mode
+            }
+        )
+        return self.mk_iterator(requrl)
+
+
+# ---------------------------------
+# Utilities
+# ---------------------------------
+class PageFetcher:
+    def __init__(self, adapter, urlbuilder, begin_page=1):
+        self.adapter = adapter
+        self.current_page = begin_page
+        self.urlbuilder = urlbuilder
+
+    def __next__(self):
+        url = self.urlbuilder.update_params(p=self.current_page)
+        self.current_page += 1
+        with self.adapter.open(url) as f:
+            return csv.read(f)
