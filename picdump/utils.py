@@ -102,6 +102,11 @@ class URLBuilder:
         self._parts = parts
         self._frozen = True
 
+    def update_params(self, **kw):
+        newparams = copy.deepcopy(self.params)
+        newparams.update(kw)
+        return self.update_with(params=newparams)
+
     def update_with(self, **parts_kw):
         for k, v in parts_kw.items():
             if k not in self.DEFAULT_PARTS:
