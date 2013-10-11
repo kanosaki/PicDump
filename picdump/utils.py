@@ -39,6 +39,11 @@ class PageIterator:
         self.queue = queue.deque()
         self.is_source_empty = False
 
+    def reset(self):
+        self.source.reset()
+        self.queue = queue.deque()
+        self.is_source_empty = False
+
     def __next__(self):
         self.prefetch(1)
         try:
@@ -69,6 +74,8 @@ class PageIterator:
     @property
     def buffered_size(self):
         return len(self.queue)
+
+
 
 
 def with_prefix(prefix, value):
@@ -150,4 +157,4 @@ class URLBuilder:
                             name, self.__class__.__name__))
 
     def to_request(self):
-        pass
+        raise NotImplemented()
