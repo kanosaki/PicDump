@@ -1,6 +1,5 @@
 
 # config.py -- Configuration loader
-from picdump import config_default
 
 
 class ConfigLoader:
@@ -9,35 +8,20 @@ class ConfigLoader:
 
     def load(self):
         locs = {}
-        globs = self.prepare_globals()
-        exec(self.configfile, globs, locs)
+        exec(self.configfile, {}, locs)
         return Config(locs)
-
-    def prepare_globals(self):
-        from picdump.scheduler import Updater
-        from picdump.folder import Folder
-        dic = {
-            'Updater': Updater,
-            'Folder': Folder
-        }
-        dic.update(self.configfacades())
-        return dic
-
-    def configfacades(self):
-        import picdump.pixiv.facade
-        return {
-            'Pixiv': picdump.pixiv.facade.ConfigFacade
-        }
-
-
-def load_default():
-    return Config({
-        'pixiv': config_default.pixiv,
-        'folders': config_default.folders
-    })
 
 
 class Config:
     # config_obj: dict -- defined variables in config file
     def __init__(self, config_obj):
-        pass
+        self._validate_config(config_obj)
+        self._config_obj = config_obj
+
+    def _validate_config(self, obj):
+        def validate():
+            if 'folders' not in obj:
+                yield 'Missing folders attribute'
+        errors = list(validate())
+        if len(errors) > 0:
+            raise RuntimeError('. '.join(errors))
