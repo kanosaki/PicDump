@@ -136,3 +136,11 @@ class Item:
     @property
     def member_illust_page_url(self):
         return 'http://www.pixiv.net/member_illust.php?mode=medium&illust_id={}'.format(self.item_id)
+
+    @property
+    def is_illust(self):
+        return False
+
+    @property
+    def is_manga(self):
+        return False

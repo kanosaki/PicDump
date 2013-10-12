@@ -14,4 +14,12 @@ class Illust(Item):
         res = self.api.adapter.get(self.image_url, referer=referer)
         return Image(res, self)
 
+    def open_all_images(self):
+        return [self.open_image()]
+
+    @property
+    def is_illust(self):
+        return True
+
+
 

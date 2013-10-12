@@ -1,6 +1,10 @@
+import os
+import os.path
 import datetime
 import itertools
+
 from picdump import scheduler
+from picdump import utils
 
 
 DEFAULT_UPDATE_INTERVAL = datetime.timedelta(hours=1)
@@ -14,18 +18,29 @@ class Folder:
             raise Exception("source for {} is required".format(path))
         if updater is None:
             raise Exception("update for {} is required".format(path))
-        self.path = path
         self.source = source
         self.updater = updater
 
+        # Fix path
+        if not os.path.isabs(path):
+            path = utils.app_path(path)
+        self.path = path
+        self._validate_folder()
+
+    def _validate_folder(self):
+        if not os.path.isdir(self.path):
+            os.makedirs(self.path)  # If some error is raised here, we should abort application.
+
     def start_dump(self):
-        raise NotImplementedError()
+        self.updater.start(self)
 
     def clear(self):
-        raise NotImplementedError()
+        utils.remove_files(self.path)
 
     def sink(self, it):
-        raise NotImplementedError()
+        for fileinfo in it:
+            image = fileinfo.open_image()
+            image.save_to(dir=self.path)
 
 
 class Updater(scheduler.Worker):

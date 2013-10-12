@@ -1,5 +1,6 @@
 
 import os.path
+from picdump.utils import normalize_filename
 
 
 # Inherit and set 'data' attribute
@@ -10,7 +11,7 @@ class Image:
         if path:
             self.save_to_path(path)
         else:
-            filename = filename or self.default_filename
+            filename = normalize_filename(filename or self.default_filename)
             self.save_to_path(os.path.join(dir, filename))
 
     def save_to_path(self, path):

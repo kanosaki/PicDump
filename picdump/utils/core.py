@@ -1,4 +1,5 @@
-
+import os
+import os.path
 
 # Utility functions
 def cached_property(f):
@@ -34,3 +35,25 @@ DEFAULT_TIMESTAMP_FORMAT = "%Y/%m/%d %H:%M:%S"
 
 def format_datetime(stamp, fmt=DEFAULT_TIMESTAMP_FORMAT):
     return stamp.strftime(fmt)
+
+
+APP_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))
+
+
+def absjoin(*args):
+    return os.path.abspath(os.path.join(*args))
+
+
+def app_path(*args):
+    return absjoin(APP_ROOT, *args)
+
+
+def remove_files(directory):
+    if not os.path.isdir(directory):
+        raise RuntimeError(directory + 'is not valid directory path')
+    for file_name in os.listdir(directory):
+        path = os.path.join(directory, file_name)
+        if os.path.isfile(path):
+            os.unlink(path)
+
+
