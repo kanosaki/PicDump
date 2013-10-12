@@ -10,7 +10,7 @@ class DummyAdapter:
         self.return_value = return_value
         self.called = False
 
-    def get(self, url):
+    def get_text(self, url):
         if self.called:
             return ""
         else:

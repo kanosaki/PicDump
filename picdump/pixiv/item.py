@@ -1,10 +1,8 @@
 from html.parser import HTMLParser
 from datetime import datetime
 
-import requests
-
 from picdump.utils import cached_property, format_datetime
-from picdump.pixiv import Image
+from picdump.pixiv.image import Image
 
 _html_parser = HTMLParser()
 TIMESTAMP_FORMAT = '%Y-%m-%d %H:%M:%S'
@@ -65,7 +63,7 @@ class Item:
 
     def open_thumbnail(self):
         res = self.api.adapter.get(self.thumbnail)
-        return Image(res, self)
+        return Image(res, self, type_prefix='thumb')
 
     @property
     def mobile_image(self):
@@ -115,7 +113,8 @@ class Item:
         return self._row.author_thumbnail
 
     def open_author_thumbnail(self):
-        return self.api.adapter.open(self.author_thumbnail)
+        res = self.api.adapter.open(self.author_thumbnail)
+        return Image(res, self, type_prefix='author_thumb')
 
     def __str__(self):
         classname = type(self).__name__

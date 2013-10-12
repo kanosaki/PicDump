@@ -15,7 +15,7 @@ SAMPLE_LINE = '"12345678","1234567","jpg","Title","35","2Q",' + \
 
 class TestCSVRow(unittest.TestCase):
     def test_parse_line(self):
-        contents = list(csv.parse(SAMPLE_LINE))
+        contents = list(csv.parse(SAMPLE_LINE, None))  # api is not used for now
         self.assertEqual(1, len(contents))
         illust = contents[0]
         self.assertEquals(illust.illust_id, 12345678)
