@@ -1,5 +1,7 @@
 test:
-	python -m unittest
+	nosetests --rednose
+test_all:
+	UNITTEST_MODE=full nosetests --rednose
 run:
 	./bin/picdumpd
 clean:
@@ -9,3 +11,4 @@ clean:
 		* ) rm $$d/*.pyc ;; \
 	  esac \
 	done
+	rm *.log

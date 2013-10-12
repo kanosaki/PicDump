@@ -1,4 +1,5 @@
 .idea/
+/default/
 
 __pycache__/
 .ropeproject/
