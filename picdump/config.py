@@ -12,16 +12,25 @@ class ConfigLoader:
         return Config(locs)
 
 
+class ConfigFileError(RuntimeError):
+    pass
+
+
 class Config:
+    ATTRIBUTES = ['folders']
+
     # config_obj: dict -- defined variables in config file
     def __init__(self, config_obj):
-        self._validate_config(config_obj)
+        self._init(config_obj)
         self._config_obj = config_obj
 
-    def _validate_config(self, obj):
-        def validate():
-            if 'folders' not in obj:
-                yield 'Missing folders attribute'
-        errors = list(validate())
-        if len(errors) > 0:
-            raise RuntimeError('. '.join(errors))
+    def _init(self, obj):
+        missing_attributes = []
+        for attr in self.ATTRIBUTES:
+            if attr in obj:
+                setattr(self, attr, obj[attr])
+            else:
+                missing_attributes.append(attr)
+        if missing_attributes:  # if there are missing attributes
+            missing_attrs = ', '.join(missing_attributes)
+            raise ConfigFileError('Missing attribute(s): {}'.format(missing_attrs))

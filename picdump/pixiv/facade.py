@@ -11,3 +11,7 @@ class ConfigFacade:
         self.content_type = api.RankingContentType
         self.search_mode = api.SearchMode
         self.span = api.RankingSpan
+
+# An alias
+class Pixiv(ConfigFacade):
+    pass
