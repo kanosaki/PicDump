@@ -114,7 +114,7 @@ class Item:
         return self._row.author_thumbnail
 
     def open_author_thumbnail(self):
-        res = self.api.adapter.open(self.author_thumbnail)
+        res = self.api.adapter.get(self.author_thumbnail)
         return Image(res, self, type_prefix='author_thumb')
 
     def __str__(self):
@@ -132,3 +132,7 @@ class Item:
     def user_image_url(self, filename):
         pat = self.PAT_USER_IMAGE_DIRECTORY_TRIMMER
         return pat.sub('/' + filename, self.mobile_image)
+
+    @property
+    def member_illust_page_url(self):
+        return 'http://www.pixiv.net/member_illust.php?mode=medium&illust_id={}'.format(self.item_id)
