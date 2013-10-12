@@ -8,20 +8,20 @@ NEWLINE = '\n'
 
 
 class ItemFactory:
-    def __call__(self, row):
+    def __call__(self, row, api):
         if row.pages == '':
-            return illust.Illust(row)
+            return illust.Illust(row, api)
         else:
-            return manga.Manga(row)
+            return manga.Manga(row, api)
 
 
-def parse(doc):
+def parse(doc, api):
     item_factory = ItemFactory()
     for line in doc.split(NEWLINE):
         if line == '':
             continue
         row = CSVRow(line)
-        yield item_factory(row)
+        yield item_factory(row, api)
 
 
 class CSVRow:

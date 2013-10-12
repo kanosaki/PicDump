@@ -1,8 +1,10 @@
-
 from html.parser import HTMLParser
 from datetime import datetime
 
-from picdump.utils import cached_property
+import requests
+
+from picdump.utils import cached_property, format_datetime
+from picdump.pixiv import Image
 
 _html_parser = HTMLParser()
 TIMESTAMP_FORMAT = '%Y-%m-%d %H:%M:%S'
@@ -20,16 +22,22 @@ def unescape(html_doc):
 
 
 class Item:
-    def __init__(self, row):
+    def __init__(self, row, api):
         self._row = row
+        self.api = api
 
     @property
     def is_accessible(self):
-        return self.illust_id != 0
+        return self.item_id != 0
 
     @cached_property
-    def illust_id(self):
+    def item_id(self):
         return int(self._row.illust_id)
+
+    # An alias for item_id
+    @property
+    def illust_id(self):
+        return self.item_id
 
     @cached_property
     def author_id(self):
@@ -54,6 +62,10 @@ class Item:
     @property
     def thumbnail(self):
         return self._row.thumbnail
+
+    def open_thumbnail(self):
+        res = self.api.adapter.get(self.thumbnail)
+        return Image(res, self)
 
     @property
     def mobile_image(self):
@@ -101,3 +113,17 @@ class Item:
     @property
     def author_thumbnail(self):
         return self._row.author_thumbnail
+
+    def open_author_thumbnail(self):
+        return self.api.adapter.open(self.author_thumbnail)
+
+    def __str__(self):
+        classname = type(self).__name__
+        return '[{} "{}"(by {}) id={} time={}]'.format(classname,
+                                                       self.title,
+                                                       self.author_name,
+                                                       self.item_id,
+                                                       format_datetime(self.timestamp))
+
+    __repr__ = __str__
+

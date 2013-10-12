@@ -2,6 +2,7 @@
 import queue
 import urllib.parse
 import copy
+import itertools
 
 
 # Utility functions
@@ -74,6 +75,11 @@ class PageIterator:
     @property
     def buffered_size(self):
         return len(self.queue)
+
+    def take(self, size=None):
+        if size is None:
+            size = self.page_size
+        return list(itertools.islice(self, size))
 
 
 
@@ -158,3 +164,10 @@ class URLBuilder:
 
     def to_request(self):
         raise NotImplemented()
+
+
+DEFAULT_TIMESTAMP_FORMAT = "%Y/%m/%d %H:%M:%S"
+
+
+def format_datetime(stamp, fmt=DEFAULT_TIMESTAMP_FORMAT):
+    return stamp.strftime(fmt)

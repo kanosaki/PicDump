@@ -54,7 +54,7 @@ class APIFacade:
         raise NotImplemented()
 
     def mk_iterator(self, requrl):
-        return PageIterator(PageFetcher(self.api.adapter, requrl))
+        return PageIterator(PageFetcher(self.api, requrl))
 
 
 class Ranking(APIFacade):
@@ -87,16 +87,20 @@ class Search(APIFacade):
 # Utilities
 # ---------------------------------
 class PageFetcher:
-    def __init__(self, adapter, urlbuilder, begin_page=1):
-        self.adapter = adapter
+    def __init__(self, api, urlbuilder, begin_page=1):
+        self.adapter = api.adapter
+        self.api = api
         self.current_page = begin_page
         self.urlbuilder = urlbuilder
 
     def __next__(self):
         url = self.urlbuilder.update_params(p=self.current_page)
         self.current_page += 1
-        csv_page = self.adapter.get(url)
-        contents = list(csv.parse(csv_page))
+        csv_page = self.adapter.get_text(url)
+        contents = list(csv.parse(csv_page, self.api))
         if len(contents) == 0:
             raise StopIteration()
         return contents
+
+    def reset(self):
+        self.current_page = 1
