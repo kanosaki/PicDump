@@ -1,87 +1,6 @@
 
-import queue
 import urllib.parse
 import copy
-import itertools
-
-
-# Utility functions
-def cached_property(f):
-    def get(self):
-        try:
-            return self._property_cache[f]
-        except AttributeError:
-            self._property_cache = {}
-            x = self._property_cache[f] = f(self)
-            return x
-        except KeyError:
-            x = self._property_cache[f] = f(self)
-            return x
-    return property(get)
-
-
-def void_fn(*args, **kw):
-    pass
-
-
-def id_fn(arg):
-    return arg
-
-
-def constant_fn(const):
-    def inner(*args, **kw):
-        return const
-    return inner
-
-
-class PageIterator:
-    def __init__(self, source):
-        self.source = source
-        self.queue = queue.deque()
-        self.is_source_empty = False
-
-    def reset(self):
-        self.source.reset()
-        self.queue = queue.deque()
-        self.is_source_empty = False
-
-    def __next__(self):
-        self.prefetch(1)
-        try:
-            return self.queue.pop()
-        except IndexError:
-            raise StopIteration()
-
-    def __iter__(self):
-        return self
-
-    def fetch(self):
-        try:
-            next_page = next(self.source)
-            for item in next_page:
-                self.queue.appendleft(item)
-        except StopIteration:
-            self.is_source_empty = True
-
-    def prefetch(self, buffer_to):
-        if self.buffered_size < buffer_to and not self.is_source_empty:
-            self.fetch()
-            self.prefetch(buffer_to)
-
-    @property
-    def page_size(self):
-        return 50
-
-    @property
-    def buffered_size(self):
-        return len(self.queue)
-
-    def take(self, size=None):
-        if size is None:
-            size = self.page_size
-        return list(itertools.islice(self, size))
-
-
 
 
 def with_prefix(prefix, value):
@@ -160,14 +79,7 @@ class URLBuilder:
             object.__setattr__(self, name, value)
         else:
             raise TypeError('Cannot set name %r on object of type %s' % (
-                            name, self.__class__.__name__))
+                name, self.__class__.__name__))
 
     def to_request(self):
         raise NotImplemented()
-
-
-DEFAULT_TIMESTAMP_FORMAT = "%Y/%m/%d %H:%M:%S"
-
-
-def format_datetime(stamp, fmt=DEFAULT_TIMESTAMP_FORMAT):
-    return stamp.strftime(fmt)
