@@ -1,3 +1,4 @@
+import re
 from html.parser import HTMLParser
 from datetime import datetime
 
@@ -126,3 +127,8 @@ class Item:
 
     __repr__ = __str__
 
+    PAT_USER_IMAGE_DIRECTORY_TRIMMER = re.compile(r'/mobile/.+')
+
+    def user_image_url(self, filename):
+        pat = self.PAT_USER_IMAGE_DIRECTORY_TRIMMER
+        return pat.sub('/' + filename, self.mobile_image)
