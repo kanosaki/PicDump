@@ -10,6 +10,7 @@ class Image(image.Image):
         :param res: HTTP Response from 'requests'
         :param item: picdump.pixiv.Item
         """
+        super().__init__()
         res.raise_for_status()  # raise error if HTTP GET has not been correctly finished.
         self.item = item
         self.data = res.content

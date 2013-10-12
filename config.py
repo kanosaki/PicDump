@@ -1,7 +1,10 @@
 from datetime import timedelta
+
 from picdump.folder import Folder, Updater
 from picdump import pixiv
+from picdump import log
 
+log.init_logger()
 
 pixiv = pixiv.create(username="foobar", password="hogehoge")
 

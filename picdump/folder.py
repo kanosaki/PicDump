@@ -1,8 +1,8 @@
 import os
-import os.path
 import datetime
 import itertools
 
+from picdump.log import get_logger
 from picdump import scheduler
 from picdump import utils
 
@@ -25,13 +25,16 @@ class Folder:
         if not os.path.isabs(path):
             path = utils.app_path(path)
         self.path = path
+        self.logger = get_logger('folder.{}'.format(os.path.basename(path)))
         self._validate_folder()
+        self.logger.info('Ready.')
 
     def _validate_folder(self):
         if not os.path.isdir(self.path):
             os.makedirs(self.path)  # If some error is raised here, we should abort application.
 
     def start_dump(self):
+        self.logger.info('Start dumping')
         self.updater.start(self)
 
     def clear(self):
@@ -41,6 +44,8 @@ class Folder:
         for fileinfo in it:
             image = fileinfo.open_image()
             image.save_to(dir=self.path)
+            self.logger.info('Saved: {}'.format(fileinfo))
+        self.logger.info('Dumping done.')
 
 
 class Updater(scheduler.Worker):
@@ -61,6 +66,7 @@ class Updater(scheduler.Worker):
 
     def work(self):
         folder = self.target_folder
+        folder.logger.info('Updating..')
         if self.folder_clear:
             folder.clear()
         if self.source_reset:

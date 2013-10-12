@@ -45,7 +45,10 @@ def absjoin(*args):
 
 
 def app_path(*args):
-    return absjoin(APP_ROOT, *args)
+    if os.path.isabs(os.path.join(*args)):
+        return os.path.join(*args)
+    else:
+        return absjoin(APP_ROOT, *args)
 
 
 def remove_files(directory):
