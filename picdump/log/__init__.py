@@ -1,1 +1,5 @@
-__author__ = 'saki'
+
+def info(msg):
+    pass
+
+
