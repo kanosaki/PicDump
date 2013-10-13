@@ -17,7 +17,7 @@ class ConfigFileError(RuntimeError):
 
 
 class Config:
-    ATTRIBUTES = ['folders']
+    ATTRIBUTES = ['folders', 'cache_dir']
 
     # config_obj: dict -- defined variables in config file
     def __init__(self, config_obj):

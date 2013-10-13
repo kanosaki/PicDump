@@ -2,13 +2,15 @@
 from picdump.webadapter import WebAdapter
 from picdump.utils import URLBuilder, PageIterator
 from picdump.pixiv import csv
+from picdump import app
 
 
 API_HOST = "spapi.pixiv.net"
 
 
-class API:
+class API(app.HasAppMixin):
     def __init__(self, adapter=None):
+        super().__init__()
         self.adapter = adapter or WebAdapter()
         self.ranking = Ranking(self)
         self.search = Search(self)

@@ -11,7 +11,9 @@ DEFAULT_UPDATE_INTERVAL = datetime.timedelta(hours=1)
 
 
 class Folder:
-    def __init__(self, path=None, source=None, updater=None):
+    def __init__(self, name=None, path=None, source=None, updater=None):
+        if name is None:
+            raise Exception("name required")
         if path is None:
             raise Exception("path required")
         if source is None:
@@ -25,7 +27,8 @@ class Folder:
         if not os.path.isabs(path):
             path = utils.app_path(path)
         self.path = path
-        self.logger = get_logger('folder.{}'.format(os.path.basename(path)))
+        self.name = name
+        self.logger = get_logger('folder.{}'.format(name))
         self._validate_folder()
         self.logger.info('Ready.')
 

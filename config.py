@@ -6,15 +6,17 @@ from picdump import log
 
 log.init_logger()
 
-pixiv = pixiv.create(username="foobar", password="hogehoge")
+cache_dir = "cache"
 
+pixiv = pixiv.create(username="foobar", password="hogehoge")
 
 folders = [
     Folder(
+        name="default",
         path="default",
         source=pixiv.ranking(span=pixiv.span.daily),
         updater=Updater(
-            interval=timedelta(hours=3),
+            interval=timedelta(seconds=5),
             clear_dir=True,
             source_reset=True,
             size=pixiv.page_size
