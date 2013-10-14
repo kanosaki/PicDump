@@ -46,7 +46,7 @@ class AppInjector:
             raise RuntimeError('Re-injection detected')
         for target in self.targets:
             if hasattr(target, '_inject_app'):
-                target.inject_app(app)
+                target._inject_app(app)
             else:
                 target.app = app
         self.previous_injected = app
