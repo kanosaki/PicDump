@@ -18,7 +18,7 @@ def init_logger(logfile="picdump.log", level=logging.INFO):
         logging.getLogger('').warn('Logger Re-initialized!!')
         return
     logfilepath = picdump.utils.app_path(logfile)
-    filehandler = logging.handlers.RotatingFileHandler(logfilepath, maxBytes=10240, backupCount=5)
+    filehandler = logging.handlers.TimedRotatingFileHandler(logfilepath, when='W0', backupCount=4)  # Rotate on Monday
     filehandler.setFormatter(logging.Formatter('%(asctime)s %(name)-24s %(levelname)-8s %(message)s'))
     consolehandler = logging.StreamHandler(sys.stdout)
     consolehandler.setFormatter(logging.Formatter('%(name)-24s %(levelname)-8s %(message)s'))
