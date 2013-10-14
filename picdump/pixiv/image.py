@@ -74,6 +74,10 @@ class MangaPageImage(ItemImage):
     def cache_id(self):
         return '{}_p{}.{}'.format(self.item.item_id, self.page, self.item.extension)
 
+    @property
+    def type_suffix(self):
+        return '_p{}'.format(self.page)
+
 
 class MemberThumbnail(ItemImage):
     type_suffix = '_member_thumb'
