@@ -1,33 +1,92 @@
+from urllib.parse import urlparse
 
 from picdump import image
 
-# Represents one image file
 
-
-class Image(image.Image):
-    def __init__(self, res, item, type_prefix=None):
-        """
-        :param res: HTTP Response from 'requests'
-        :param item: picdump.pixiv.Item
-        """
+class ItemImage(image.Image):
+    def __init__(self, item, api, content_factory):
         super().__init__()
-        res.raise_for_status()  # raise error if HTTP GET has not been correctly finished.
         self.item = item
-        self.data = res.content
-        self.type_prefix = type_prefix
-
-    @property
-    def dot_and_extension(self):
-        if self.item.extension:
-            return '.{}'.format(self.item.extension)
-        else:
-            return ''
+        self.api = api
+        self.content_factory = content_factory
 
     @property
     def default_filename(self):
         item = self.item
-        if self.type_prefix is not None:
-            prefix = '_' + self.type_prefix
+        return '{}{} {}{}'.format(item.item_id, self.type_suffix, item.title, self.dot_and_extension)
+
+    @property
+    def saved_path(self):
+        cache = self.api.cache
+        if self.cache_id in cache:
+            return cache.get_path(self.cache_id)
         else:
-            prefix = ''
-        return '{}{} {}{}'.format(item.item_id, prefix, item.title, self.dot_and_extension)
+            return None
+
+    def fetch_content(self):
+        content = self.content_factory()
+        self.api.cache.put(self.cache_id, content)
+        return content
+
+    @property
+    def dot_and_extension(self):
+        return '.{}'.format(self.item.extension)
+
+
+class IllustBigImage(ItemImage):
+    type_suffix = ''
+
+    @property
+    def cache_id(self):
+        return '{}.{}'.format(self.item.item_id, self.item.extension)
+
+
+class IllustMobileImage(ItemImage):
+    type_suffix = '_mobile'
+
+    @property
+    def dot_and_extension(self):
+        return '.jpg'
+
+    @property
+    def cache_id(self):
+        return '{}_480mw.jpg'.format(self.item.item_id)
+
+
+class ThumbnailImage(ItemImage):
+    type_suffix = '_thumb'
+
+    @property
+    def dot_and_extension(self):
+        return '.jpg'
+
+    @property
+    def cache_id(self):
+        return '{}_128x128.jpg'.format(self.item.item_id)
+
+
+class MangaPageImage(ItemImage):
+    def __init__(self, item, api, content_factory, page):
+        super().__init__(item, api, content_factory)
+        self.page = page
+
+    @property
+    def cache_id(self):
+        return '{}_p{}.{}'.format(self.item.item_id, self.page, self.item.extension)
+
+
+class MemberThumbnail(ItemImage):
+    type_suffix = '_member_thumb'
+
+    @property
+    def default_filename(self):
+        item = self.item
+        return '{} {}.jpg'.format(item.author_id, item.author_screen_name)
+
+    @property
+    def dot_and_extension(self):
+        return '.jpg'
+
+    @property
+    def cache_id(self):
+        return '{}_80.jpg'.format(self.item.author_id)

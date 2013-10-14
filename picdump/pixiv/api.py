@@ -1,7 +1,9 @@
+import os
 
 from picdump.webadapter import WebAdapter
-from picdump.utils import URLBuilder, PageIterator
+from picdump.utils import URLBuilder, PageIterator, app_path
 from picdump.pixiv import csv
+from picdump.pixiv import cache
 from picdump import app
 
 
@@ -14,6 +16,17 @@ class API(app.HasAppMixin):
         self.adapter = adapter or WebAdapter()
         self.ranking = Ranking(self)
         self.search = Search(self)
+        self.cache = cache.VoidCache()
+
+    def image_cache_dir(self):
+        config = self.app.config
+        return app_path(config.cache_dir, 'pixiv')
+
+    def on_app_injected(self, app):
+        self.cache = cache.ImageCache(self.image_cache_dir())
+
+    def set_cache_dir(self, dirpath):
+        self.cache = cache.ImageCache(dirpath)
 
 
 # ---------------------------------

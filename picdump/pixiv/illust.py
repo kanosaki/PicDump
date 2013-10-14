@@ -1,6 +1,6 @@
 from picdump.pixiv.item import Item
 from picdump.utils import cached_property
-from picdump.pixiv.image import Image
+from picdump.pixiv import image
 
 
 class Illust(Item):
@@ -11,8 +11,7 @@ class Illust(Item):
 
     def open_image(self):
         referer = self.member_illust_page_url
-        res = self.api.adapter.get(self.image_url, referer=referer)
-        return Image(res, self)
+        return self._open(self.image_url, image.IllustBigImage, referer=referer)
 
     def open_all_images(self):
         return [self.open_image()]

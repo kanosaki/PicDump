@@ -3,7 +3,7 @@ from html.parser import HTMLParser
 from datetime import datetime
 
 from picdump.utils import cached_property, format_datetime
-from picdump.pixiv.image import Image
+from picdump.pixiv import image
 
 _html_parser = HTMLParser()
 TIMESTAMP_FORMAT = '%Y-%m-%d %H:%M:%S'
@@ -24,6 +24,16 @@ class Item:
     def __init__(self, row, api):
         self._row = row
         self.api = api
+        self._updated_at = datetime.now()
+
+    def _open(self, url, image_class, referer=None):
+        api = self.api
+
+        def factory():
+            res = api.adapter.get(url, referer=referer)
+            res.raise_for_status()
+            return res.content
+        return image_class(self, self.api, factory)
 
     @property
     def is_accessible(self):
@@ -63,16 +73,26 @@ class Item:
         return self._row.thumbnail
 
     def open_thumbnail(self):
-        res = self.api.adapter.get(self.thumbnail)
-        return Image(res, self, type_prefix='thumb')
+        return self._open(self.thumbnail, image.ThumbnailImage)
 
     @property
     def mobile_image(self):
         return self._row.mobile_image
 
+    def open_mobile_image(self):
+        return self._open(self.mobile_image, image.IllustMobileImage)
+
     @cached_property
     def timestamp(self):
         return datetime.strptime(self._row.timestamp, TIMESTAMP_FORMAT)
+
+    @property
+    def created_at(self):
+        return self.timestamp
+
+    @property
+    def updated_at(self):
+        return self._updated_at
 
     @cached_property
     def tags(self):
@@ -114,8 +134,7 @@ class Item:
         return self._row.author_thumbnail
 
     def open_author_thumbnail(self):
-        res = self.api.adapter.get(self.author_thumbnail)
-        return Image(res, self, type_prefix='author_thumb')
+        return self._open(self.author_thumbnail, image.MemberThumbnail)
 
     def __str__(self):
         classname = type(self).__name__

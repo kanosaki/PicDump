@@ -28,6 +28,10 @@ class HasAppMixin:
 
     def _inject_app(self, app):
         self.__app = app
+        self.on_app_injected(app)
+
+    def on_app_injected(self, app):
+        pass
 
 
 class AppInjector:

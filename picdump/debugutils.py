@@ -5,6 +5,7 @@ from picdump.utils import cached_property
 class Pixiv:
     def __init__(self):
         self.pixiv = pixiv.create()
+        self.pixiv.api.set_cache_dir('pixiv_cache')
 
     @cached_property
     def daily(self):

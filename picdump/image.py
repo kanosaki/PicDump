@@ -1,31 +1,42 @@
 import shutil
 import os.path
-from picdump.utils import normalize_filename
+from picdump.utils import normalize_filename, absjoin
 
 
-# Inherit and set 'data' attribute
+# Inherit and set 'content' attribute
 class Image:
     def __init__(self):
-        self.saved_path = None
+        self._saved_path = None
+
+    @property
+    def saved_path(self):
+        return self._saved_path
+
+    @property
+    def is_fetched(self):
+        return self.saved_path is not None
 
     def save_to(self, path=None, dir=None, filename=None, force=False):
+        save_path = self.determine_save_path(path=path, dir=dir, filename=filename)
+        if self.is_fetched and not force:
+            self.copy_file_to(save_path)
+        else:
+            data = self.fetch_content()
+            self.write_to(save_path, data)
+
+    def determine_save_path(self, path=None, dir=None, filename=None):
         if path is None and dir is None:
             raise RuntimeError('path or directory must be specified')
-        if path:
-            self.save_to_path(path, force)
-        else:
+        if not path:
             filename = normalize_filename(filename or self.default_filename)
-            self.save_to_path(os.path.join(dir, filename), force)
+            path = absjoin(dir, filename)
+        return path
 
-    def save_to_path(self, path, force):
-        if self.saved_path and not force:
-            self.copy_to(path)
-            return
+    def write_to(self, path, data):
         with open(path, 'wb') as fp:
-            fp.write(self.data)
-        self.saved_path = path
+            fp.write(data)
 
-    def copy_to(self, path):
+    def copy_file_to(self, path):
         if self.saved_path == path:
             return
         shutil.copyfile(self.saved_path, path)

@@ -1,9 +1,18 @@
 from picdump.pixiv.item import Item
 from picdump.utils import cached_property
-from picdump.pixiv.image import Image
+from picdump.pixiv import image
 
 
 class Manga(Item):
+    def _open_manga_page(self, url, page, referer=None):
+        api = self.api
+
+        def factory():
+            res = api.adapter.get(url, referer=referer)
+            res.raise_for_status()
+            return res.content
+        return image.MangaPageImage(self, self.api, factory, page)
+
     @cached_property
     def page_urls(self):
         filenames = (
@@ -15,16 +24,14 @@ class Manga(Item):
     def open_page_images(self):
         referer = self.member_illust_page_url
         for url, page in zip(self.page_urls, range(self.pages)):
-            res = self.api.adapter.get(url, referer=referer)
-            yield Image(res, self, type_prefix=str(page))
+            yield self._open_manga_page(url, page, referer)
 
     def open_all_images(self):
         return list(self.open_page_images())
 
     def open_image(self):
         referer = self.member_illust_page_url
-        res = self.api.adapter.get(self.page_urls[0], referer=referer)
-        return Image(res, self)
+        return self._open_manga_page(self.page_urls[0], 0, referer=referer)
 
     @property
     def is_manga(self):
