@@ -68,8 +68,13 @@ class APIFacade:
     def path(self):
         raise NotImplemented()
 
-    def mk_iterator(self, requrl):
-        return PageIterator(PageFetcher(self.api, requrl))
+    def mk_static_iterator(self, requrl):
+        return PageIterator(StaticPageFetcher(self.api, requrl))
+
+    mk_iterator = mk_static_iterator
+
+    def mk_dynamic_iterator(self, url_factory):
+        return PageIterator(DynamicPageFetcher(self.api, url_factory))
 
 
 class Ranking(APIFacade):
@@ -102,14 +107,17 @@ class Search(APIFacade):
 # Utilities
 # ---------------------------------
 class PageFetcher:
-    def __init__(self, api, urlbuilder, begin_page=1):
+    def __init__(self, api, begin_page=1):
         self.adapter = api.adapter
         self.api = api
         self.current_page = begin_page
-        self.urlbuilder = urlbuilder
+
+    def get_next_urlbuilder(self):
+        raise NotImplementedError()
 
     def __next__(self):
-        url = self.urlbuilder.update_params(p=self.current_page)
+        builder = self.get_next_urlbuilder()
+        url = builder.update_params(p=self.current_page)
         self.current_page += 1
         csv_page = self.adapter.get_text(url)
         contents = list(csv.parse(csv_page, self.api))
@@ -119,3 +127,21 @@ class PageFetcher:
 
     def reset(self):
         self.current_page = 1
+
+
+class StaticPageFetcher(PageFetcher):
+    def __init__(self, api, urlbuilder, begin_page=1):
+        super().__init__(api, begin_page)
+        self.urlbuilder = urlbuilder
+
+    def get_next_urlbuilder(self):
+        return self.urlbuilder
+
+
+class DynamicPageFetcher(PageFetcher):
+    def __init__(self, api, url_factory, begin_page=1):
+        super().__init__(api, begin_page)
+        self.url_factory = url_factory
+
+    def get_next_urlbuilder(self):
+        return self.url_factory()
