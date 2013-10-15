@@ -1,4 +1,4 @@
-import os
+import datetime
 
 from picdump.webadapter import WebAdapter
 from picdump.utils import URLBuilder, PageIterator, app_path
@@ -15,6 +15,7 @@ class API(app.HasAppMixin):
         super().__init__()
         self.adapter = adapter or WebAdapter()
         self.ranking = Ranking(self)
+        self.ranking_log = RankingLog(self)
         self.search = Search(self)
         self.cache = cache.VoidCache()
 
@@ -88,6 +89,51 @@ class Ranking(APIFacade):
             }
         )
         return self.mk_iterator(requrl)
+
+
+class RankingLog(APIFacade):
+    path = '/iphone/ranking_log.php'
+
+    def __call__(self, year, month, day, mode: RankingSpan=RankingSpan.daily):
+        requrl = self.urlbuilder.update_with(
+            params={
+                'mode': mode,
+                'Date_Year': year,
+                'Date_Month': '{:02d}'.format(month),
+                'Date_Day': '{:02d}'.format(day)
+            }
+        )
+        return self.mk_iterator(requrl)
+
+    def days_ago(self, days, mode: RankingSpan=RankingSpan.daily):
+        delta = datetime.timedelta(days=days)
+        factory = RankingLogTimedeltaFactory(self.urlbuilder, delta, mode)
+        return self.mk_dynamic_iterator(factory)
+
+    def yesterday(self):
+        return self.days_ago(1)
+
+
+class RankingLogTimedeltaFactory:
+    def __init__(self, base_url, delta, mode):
+        self.delta = delta
+        self.mode = mode
+        self.base_url = base_url
+
+    def __call__(self):
+        date = self.designate_date()
+        return self.base_url.update_with(
+            params={
+                'mode': self.mode,
+                'Date_Year': date.year,
+                'Date_Month': '{:02d}'.format(date.month),
+                'Date_Day': '{:02d}'.format(date.day)
+            }
+        )
+
+    def designate_date(self):
+        the_day = datetime.datetime.now() - self.delta
+        return the_day.date()
 
 
 class Search(APIFacade):
