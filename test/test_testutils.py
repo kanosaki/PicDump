@@ -29,4 +29,28 @@ class TestTempDir(unittest.TestCase):
         self.assertFalse(os.path.exists(target_dir))
         self.assertFalse(os.path.isfile(utils.absjoin(target_dir, 'foobar')))
 
+    def test_delete_if_exists_and_nesting(self):
+        target_dir = self.target_dir
+        self.assertFalse(os.path.exists(target_dir))
+        with utils.TempDir('sample_dir') as d:
+            with utils.TempDir('sample_dir', delete_if_exists=True) as dd:
+                pass
+            self.assertFalse(os.path.isfile(utils.absjoin(target_dir, 'foobar')))
+            self.assertFalse(os.path.exists(target_dir))
+            with self.assertRaises(IOError):
+                with d.open('foobar', 'w') as f:
+                    f.write('hogehoge')
 
+    def test_already_exists(self):
+        target_dir = self.target_dir
+        self.assertFalse(os.path.exists(target_dir))
+        with utils.TempDir('sample_dir') as d:
+            with d.open('foobar', 'w') as f:
+                f.write('hogehoge')
+            with self.assertRaises(IOError):
+                with utils.TempDir('sample_dir') as dd:
+                    pass
+            self.assertTrue(os.path.isfile(utils.absjoin(target_dir, 'foobar')))
+            self.assertTrue(os.path.exists(target_dir))
+        self.assertFalse(os.path.exists(target_dir))
+        self.assertFalse(os.path.isfile(utils.absjoin(target_dir, 'foobar')))

@@ -30,7 +30,12 @@ class TempDir:
         self.setup()
         return self
 
+    def is_alive(self):
+        return os.path.isdir(self.path)
+
     def open(self, path, mode='r'):
+        if not self.is_alive():
+            raise IOError('Directory {} no longer available.'.format(self.path))
         return open(absjoin(self.path, path), mode)
 
     def setup(self):
@@ -38,9 +43,10 @@ class TempDir:
             if self.delete_if_exists:
                 shutil.rmtree(self.path)
             else:
-                raise RuntimeError('File exists')
+                raise IOError('File exists at {}'.format(self.path))
         if not os.path.isdir(self.path):
             os.makedirs(self.path)
 
     def teardown(self):
-        shutil.rmtree(self.path)
+        if self.is_alive():
+            shutil.rmtree(self.path)
