@@ -1,5 +1,4 @@
 import shutil
-import os.path
 from picdump.utils import normalize_filename, absjoin
 
 

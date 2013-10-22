@@ -1,7 +1,5 @@
 import weakref
 
-from picdump import log
-
 
 class App:
     """Application root context"""
@@ -64,6 +62,7 @@ def request_injection(target):
 
 def inject_app(app):
     ROOT_INJECTOR.inject(app)
+
 
 def reinject_app():
     if ROOT_INJECTOR.previous_injected is None:

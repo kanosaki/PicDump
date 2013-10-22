@@ -1,4 +1,3 @@
-from picdump.pixiv import item
 from picdump.pixiv import illust
 from picdump.pixiv import manga
 

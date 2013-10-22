@@ -1,5 +1,4 @@
 import collections
-import copy
 
 from .base import Source
 
