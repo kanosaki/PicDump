@@ -16,7 +16,7 @@ class FilterBase:
 
 class CompositeFilter(FilterBase):
     def __init__(self, *children):
-        self.children = children
+        self.children = list(children)
 
     def reset(self):
         for child in self.children:
@@ -56,12 +56,32 @@ class DisjunctionFilter(CompositeFilter):
         return '({})'.format(' or '.join(self.children))
 
 
-class BlacklistFilter(FilterBase):
-    pass
+class DefaultedFilter(FilterBase):
+    default_result = None
+
+    def predicate(self, obj):
+        if self.pre_check(obj) is True:
+            try:
+                return self.check(obj)
+            except (AttributeError, NameError, KeyError):
+                pass
+        return self.default_result
+
+    def check(self, obj):
+        """Filter body. AttributeError, NameError and KeyError will be
+           ignored and default_value will be returned."""
+
+    def pre_check(self, obj):
+        """Check whether it should be evaluated by this filter."""
+        return True
 
 
-class WhitelistFilter(FilterBase):
-    pass
+class BlacklistFilter(DefaultedFilter):
+    default_result = False
+
+
+class WhitelistFilter(DefaultedFilter):
+    default_result = True
 
 
 class PassFilter(FilterBase):
@@ -88,4 +108,3 @@ class SizeFilter(FilterBase):
 
     def reset(self):
         self.passed = 0
-
