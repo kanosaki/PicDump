@@ -2,7 +2,7 @@ import unittest
 import os
 import shutil
 
-import utils
+utils = __import__('utils')
 
 
 class TestTestUtils(unittest.TestCase):
@@ -54,3 +54,19 @@ class TestTempDir(unittest.TestCase):
             self.assertTrue(os.path.exists(target_dir))
         self.assertFalse(os.path.exists(target_dir))
         self.assertFalse(os.path.isfile(utils.absjoin(target_dir, 'foobar')))
+
+
+class TestIteratorAssertions(unittest.TestCase):
+    def test_empty(self):
+        with self.assertRaises(AssertionError):
+            utils.assert_empty_iterator(iter([1]))
+        utils.assert_empty_iterator(iter([]))
+
+    def test_nonempty(self):
+        with self.assertRaises(AssertionError):
+            utils.assert_nonempty_iterator(iter([]))
+        utils.assert_nonempty_iterator(iter([1]))
+
+
+
+

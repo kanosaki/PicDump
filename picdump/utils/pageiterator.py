@@ -50,3 +50,8 @@ class PageIterator:
         return list(itertools.islice(self, size))
 
 
+def loop_iterator(seq):
+    while True:
+        for elem in seq:
+            yield elem
+

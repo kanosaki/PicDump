@@ -50,3 +50,19 @@ class TempDir:
     def teardown(self):
         if self.is_alive():
             shutil.rmtree(self.path)
+
+
+def assert_empty_iterator(it):
+    try:
+        next(it)
+        raise AssertionError('Not empty iterator')
+    except StopIteration:
+        pass
+
+
+def assert_nonempty_iterator(it):
+    try:
+        next(it)
+    except StopIteration:
+        raise AssertionError('Empty iterator')
+
