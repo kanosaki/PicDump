@@ -1,12 +1,12 @@
-from .filter import PassFilter
-
 
 class Source:
-    def __init__(self, filter=None):
-        self.filter = filter or PassFilter.default
+    def __init__(self, parent=None):
+        self.parent = parent
 
     def reset(self):
-        self.filter.reset()
+        if self.parent is not None:
+            self.parent.reset()
 
     def __iter__(self):
+        self.reset()
         return self

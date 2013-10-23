@@ -21,7 +21,7 @@ def src(iterable):
     return DummySource(iterable)
 
 
-class TestPackageFunctions(unittest.TestCase):
+class TestCyclic(unittest.TestCase):
     def test_cyclic_spec(self):
         src_a = src(['A', 'B', 'C', 'D'])
         src_b = src([1, 2, 3])
@@ -53,6 +53,37 @@ class TestPackageFunctions(unittest.TestCase):
     def test_cyclic_empty(self):
         source = conduit.cyclic(src([]))
         self.assertListEqual([], list(source))
+
+
+class TestUnique(unittest.TestCase):
+    def test_cyclic_basic(self):
+        src_and_expected = [
+            ([], []),
+            ([1, 2, 3], [1, 2, 3]),
+            ([1, 2, 2, 1], [1, 2]),
+            ([None, None, None, 1], [None, 1]),
+        ]
+        for (s, e) in src_and_expected:
+            source = src(s)
+            self.assertListEqual(e, list(conduit.unique(source)))
+
+    def test_reset(self):
+        first = src([1, 2, 3, 3, 2, 1])
+        unique = conduit.unique(first)
+        self.assertEqual(1, next(unique))
+        self.assertEqual(2, next(unique))
+        self.assertEqual(3, next(unique))
+        unique.reset()
+        self.assertEqual(1, next(unique))
+        self.assertEqual(2, next(unique))
+        self.assertEqual(3, next(unique))
+        with self.assertRaises(StopIteration):
+            self.assertEqual(3, next(unique))
+
+    def test_spec(self):
+        first = src([1, 2, 3, 3, 2, 1])
+        unique = conduit.unique(first)
+        source_spec(unique)
 
 
 def source_spec(source):

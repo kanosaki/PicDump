@@ -1,59 +1,35 @@
 
+from .base import Source
 
-class FilterBase:
+
+class FilterBase(Source):
     def predicate(self, obj):
         pass
 
-    def __and__(self, other):
-        return ConjunctionFilter(self, other)
-
-    def __or__(self, other):
-        return DisjunctionFilter(self, other)
-
     def reset(self):
-        raise NotImplementedError()
+        super().reset()
+
+    def __next__(self):
+        next_elem = next(self.parent)
+        while not self.predicate(next_elem):
+            next_elem = next(self.parent)
+        return next_elem
 
 
-class CompositeFilter(FilterBase):
-    def __init__(self, *children):
-        self.children = list(children)
-
-    def reset(self):
-        for child in self.children:
-            child.reset()
-
-
-class ConjunctionFilter(CompositeFilter):
-    def __and__(self, other):
-        self.children.append(other)
-        return self
+class UniqueFilter(FilterBase):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self._history = set()
 
     def predicate(self, obj):
-        for child in self.children:
-            if not child.predicate(obj):
-                return False
-        return True
+        is_newone = obj not in self._history
+        if is_newone:
+            self._history.add(obj)
+        return is_newone
 
-    def __call__(self, obj):
-        return self.predicate(obj)
-
-    def __str__(self):
-        return '({})'.format(' and '.join(self.children))
-
-
-class DisjunctionFilter(CompositeFilter):
-    def __or__(self, other):
-        self.children.append(other)
-        return self
-
-    def predicate(self, obj):
-        for child in self.children:
-            if child.predicate(obj):
-                return True
-        return False
-
-    def __str__(self):
-        return '({})'.format(' or '.join(self.children))
+    def reset(self):
+        self._history.clear()
+        super().reset()
 
 
 class DefaultedFilter(FilterBase):
@@ -108,3 +84,5 @@ class SizeFilter(FilterBase):
 
     def reset(self):
         self.passed = 0
+
+
