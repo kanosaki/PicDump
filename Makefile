@@ -15,6 +15,8 @@ clean:
 	  esac \
 	done
 	rm *.log
+	rm -r cache
+	rm -r default
 
 setup:
 	pip install -r requirements.txt

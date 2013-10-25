@@ -1,5 +1,7 @@
 .idea/
 /default/
+/cache/
+/picdump.log
 
 __pycache__/
 .ropeproject/
