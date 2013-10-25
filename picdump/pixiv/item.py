@@ -26,6 +26,15 @@ class Item:
         self.api = api
         self._updated_at = datetime.now()
 
+    def __eq__(self, other):
+        try:
+            return self.item_id == other.item_id
+        except AttributeError:
+            return False
+
+    def __hash__(self):
+        return hash(self.item_id)
+
     def _open(self, url, image_class, referer=None):
         api = self.api
 

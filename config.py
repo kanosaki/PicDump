@@ -3,6 +3,7 @@ from datetime import timedelta
 from picdump.folder import Folder, Updater
 from picdump import pixiv
 from picdump import log
+from picdump.conduit import unique, cyclic
 
 log.init_logger()
 
@@ -10,16 +11,21 @@ cache_dir = "cache"
 
 pixiv = pixiv.create(username="foobar", password="hogehoge")
 
+default_source = unique(cyclic(
+    pixiv.ranking(span=pixiv.span.daily),
+    pixiv.ranking_log.days_ago(1),
+    pixiv.ranking_log.days_ago(2)))
+
 folders = [
     Folder(
         name="default",
         path="default",
-        source=pixiv.ranking(span=pixiv.span.daily),
+        source=default_source,
         updater=Updater(
             interval=timedelta(seconds=5),
             clear_dir=True,
             source_reset=True,
-            size=pixiv.page_size
+            size=pixiv.page_size * 2
         )
     )
 ]
