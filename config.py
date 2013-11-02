@@ -4,6 +4,7 @@ from picdump.folder import Folder, Updater
 from picdump import pixiv
 from picdump import log
 from picdump.conduit import unique, cyclic
+from picdump.webconsole import WebConsole
 
 log.init_logger()
 
@@ -29,4 +30,10 @@ folders = [
         )
     )
 ]
+
+webconsole = WebConsole(
+    port=4000,
+    host='localhost',
+    html_dir='html',
+)
 # pymode:lint=0
