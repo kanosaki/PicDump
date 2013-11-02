@@ -1,6 +1,6 @@
-import unittest
-utils = __import__('utils')  # Suppress PyCharm warning
+from nose.tools import *
 
+utils = __import__('utils')  # Suppress PyCharm warning
 from picdump import conduit
 
 
@@ -21,12 +21,12 @@ def src(iterable):
     return DummySource(iterable)
 
 
-class TestCompound(unittest.TestCase):
+class TestCompound:
     def test_unique_cycle(self):
         src_a = src([1, 2, 3, 4])
         src_b = src([])
         src_c = src(['a', 1, 5, 'b'])
         source = conduit.unique(conduit.cyclic(src_a, src_b, src_c))
-        self.assertLessEqual([1, 'a', 2, 3, 5, 4, 'b'], list(source))
+        assert_list_equal([1, 'a', 2, 3, 5, 4, 'b'], list(source))
         source.reset()
-        self.assertLessEqual([1, 'a', 2, 3, 5, 4, 'b'], list(source))
+        assert_list_equal([1, 'a', 2, 3, 5, 4, 'b'], list(source))

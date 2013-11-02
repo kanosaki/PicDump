@@ -1,8 +1,7 @@
 
-import unittest
-import io
+from nose.tools import *
 
-from picdump.pixiv.api import API, RankingSpan, RankingContentType, SearchMode
+from picdump.pixiv.api import API, RankingSpan, RankingContentType
 
 
 class DummyAdapter:
@@ -28,10 +27,10 @@ SAMPLE_LINE = '"12345678","1234567","jpg","Title","35","2Q",' + \
     '"0",,,"http://i1.pixiv.net/img35/profile/username/mobile/1234567_80.jpg",'
 
 
-class TestAPI(unittest.TestCase):
+class TestAPI:
     def test_ranking(self):
         dummy_adapter = DummyAdapter(SAMPLE_LINE)
         api = API(dummy_adapter)
         result = api.ranking(RankingSpan.daily, RankingContentType.rookie)
         result = list(result)
-        self.assertEqual(1, len(result))
+        assert_equal(1, len(result))

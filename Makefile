@@ -1,8 +1,10 @@
+.PHONY : test
+.PHONY : test_all
 test:
-	nosetests --rednose
+	nosetests --rednose -a '!slow'
 
 test_all:
-	UNITTEST_MODE=full nosetests --rednose
+	nosetests --rednose -a 'slow'
 
 run:
 	./bin/picdumpd

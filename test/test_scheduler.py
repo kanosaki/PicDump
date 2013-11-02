@@ -1,11 +1,13 @@
 
-import unittest
 import datetime
 import time
 import threading
 import collections
 
-import utils
+from nose.plugins.attrib import attr
+from nose.tools import *
+
+utils = __import__('utils')
 from picdump import scheduler
 
 
@@ -44,23 +46,22 @@ class DummyWorker(scheduler.Worker):
         return len(self.call_history)
 
 
-class TestWorker(unittest.TestCase):
-    def setUp(self):
+@attr('slow')
+class TestWorker:
+    def setup(self):
         scheduler.IMMEDIATE_RUN_THRESH = 0  # Disable for testing
-        if utils.TEST_MODE != 'full':
-            self.skipTest('This test will be executed only full mode($UNITTEST_MODE == "full"')
 
     def test_work_once(self):
         """A worker should be called once after Worker.start called
         """
         worker = DummyWorker(mk_interval(100), repeat=False)
-        self.assertEqual(False, worker.is_working)
+        assert_equal(False, worker.is_working)
         worker.start()
         sleep(100)
-        self.assertEqual(1, worker.called_count)
-        self.assertEqual(False, worker.is_working)
+        assert_equal(1, worker.called_count)
+        assert_equal(False, worker.is_working)
         sleep(500)
-        self.assertEqual(1, worker.called_count)
+        assert_equal(1, worker.called_count)
 
     def test_work_repeat(self):
         """A worker should be called until Worker.stop is called"""
@@ -68,17 +69,17 @@ class TestWorker(unittest.TestCase):
         worker.exit_at = 3
         worker.start()
         sleep(50)
-        self.assertEqual(1, worker.called_count)
-        self.assertEqual(True, worker.is_working)
+        assert_equal(1, worker.called_count)
+        assert_equal(True, worker.is_working)
         sleep(100)
-        self.assertEqual(2, worker.called_count)
-        self.assertEqual(True, worker.is_working)
+        assert_equal(2, worker.called_count)
+        assert_equal(True, worker.is_working)
         sleep(100)
-        self.assertEqual(3, worker.called_count)
-        self.assertEqual(False, worker.is_working)
+        assert_equal(3, worker.called_count)
+        assert_equal(False, worker.is_working)
         sleep(100)
-        self.assertEqual(3, worker.called_count)
-        self.assertEqual(False, worker.is_working)
+        assert_equal(3, worker.called_count)
+        assert_equal(False, worker.is_working)
 
 
 class HookedWorker(scheduler.Scheduler):
@@ -93,11 +94,10 @@ class HookedWorker(scheduler.Scheduler):
         return self.worker_history.popleft()
 
 
-class TestScheduler(unittest.TestCase):
-    def setUp(self):
+@attr('slow')
+class TestScheduler:
+    def setup(self):
         scheduler.IMMEDIATE_RUN_THRESH = 0  # Disable for testing
-        if utils.TEST_MODE != 'full':
-            self.skipTest('This test will be executed only full mode($UNITTEST_MODE == "full"')
 
     def test_scheduler(self):
         sched = scheduler.Scheduler()
@@ -105,14 +105,14 @@ class TestScheduler(unittest.TestCase):
         worker.exit_at = 3
         worker.start()
         sleep(50)
-        self.assertEqual(1, worker.called_count)
-        self.assertEqual(True, worker.is_working)
+        assert_equal(1, worker.called_count)
+        assert_equal(True, worker.is_working)
         sleep(100)
-        self.assertEqual(2, worker.called_count)
-        self.assertEqual(True, worker.is_working)
+        assert_equal(2, worker.called_count)
+        assert_equal(True, worker.is_working)
         sleep(100)
-        self.assertEqual(3, worker.called_count)
-        self.assertEqual(False, worker.is_working)
+        assert_equal(3, worker.called_count)
+        assert_equal(False, worker.is_working)
         sleep(100)
-        self.assertEqual(3, worker.called_count)
-        self.assertEqual(False, worker.is_working)
+        assert_equal(3, worker.called_count)
+        assert_equal(False, worker.is_working)
