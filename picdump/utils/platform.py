@@ -1,8 +1,10 @@
 
 import unicodedata
 import re
+import os
 import platform
 
+from path import path
 
 is_mac = platform.system() == 'Darwin'
 is_windows = platform.system() == 'Windows'
@@ -19,4 +21,24 @@ def normalize_filename(expr, replace_to='_'):
         return unicodedata.normalize('NFD', replaced_expr)
     else:
         return unicodedata.normalize('NFC', replaced_expr)
+
+
+def absjoin(*args):
+    return os.path.abspath(os.path.join(*args))
+
+
+APP_ROOT = absjoin(os.path.dirname(__file__), '../../')
+
+
+def app_path(*args):
+    if os.path.isabs(os.path.join(*args)):
+        return os.path.join(*args)
+    else:
+        return absjoin(APP_ROOT, *args)
+
+
+class SpecialDirectories:
+    def __init__(self):
+        self.app = path(APP_ROOT)
+        self.cache = path(self.app, 'cache')
 

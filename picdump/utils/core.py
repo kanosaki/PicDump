@@ -37,20 +37,6 @@ def format_datetime(stamp, fmt=DEFAULT_TIMESTAMP_FORMAT):
     return stamp.strftime(fmt)
 
 
-APP_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))
-
-
-def absjoin(*args):
-    return os.path.abspath(os.path.join(*args))
-
-
-def app_path(*args):
-    if os.path.isabs(os.path.join(*args)):
-        return os.path.join(*args)
-    else:
-        return absjoin(APP_ROOT, *args)
-
-
 def remove_files(directory):
     if not os.path.isdir(directory):
         raise RuntimeError(directory + 'is not valid directory path')
