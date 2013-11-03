@@ -21,7 +21,7 @@ clean:
 	rm -r default
 
 setup:
-	pip install -r requirements.txt
+	bin/setupenv.sh
 
 update_requirements:
 	pip freeze > requirements.txt
