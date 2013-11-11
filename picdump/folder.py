@@ -45,10 +45,17 @@ class Folder:
 
     def sink(self, it):
         for fileinfo in it:
-            image = fileinfo.open_image()
-            image.save_to(dir=self.path)
-            self.logger.info('Saved: {}'.format(fileinfo))
+            self._sink_image(fileinfo)
         self.logger.info('Dumping done.')
+
+    def _sink_image(self, info):
+        try:
+            image = info.open_image()
+            image.save_to(dir=self.path)
+            self.logger.info('Saved: {}'.format(info))
+        except Exception as e:
+            self.logger.error('During sinking {} -- {}'.format(info, e))
+
 
 
 class Updater(scheduler.Worker):
