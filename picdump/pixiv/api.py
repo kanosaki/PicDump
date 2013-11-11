@@ -166,7 +166,7 @@ class PageFetcher:
         url = builder.update_params(p=self.current_page)
         self.current_page += 1
         csv_page = self.adapter.get_text(url)
-        contents = list(csv.parse(csv_page, self.api))
+        contents = [i for i in csv.parse(csv_page, self.api) if i.is_valid]
         if len(contents) == 0:
             raise StopIteration()
         return contents

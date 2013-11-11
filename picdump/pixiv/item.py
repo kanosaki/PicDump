@@ -172,3 +172,25 @@ class Item:
     @property
     def is_manga(self):
         return False
+
+    @cached_property
+    def is_valid(self):
+        if not self.is_accessible:
+            return False
+        try:
+            self.item_id
+            self.created_at
+            self.tags
+            self.tools
+            self.author_id
+            self.pages
+            self.caption
+            self.comments
+            self.views
+            self.points
+            return True
+        except:
+            return False
+
+
+
