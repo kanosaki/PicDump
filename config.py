@@ -5,6 +5,7 @@ from picdump import pixiv
 from picdump import log
 from picdump.conduit import unique, cyclic
 from picdump.webconsole import WebConsole
+from picdump.pixiv.filters import filter_manga
 
 log.init_logger()
 
@@ -12,10 +13,10 @@ cache_dir = "cache"
 
 pixiv = pixiv.create(username="foobar", password="hogehoge")
 
-default_source = unique(cyclic(
+default_source = filter_manga(unique(cyclic(
     pixiv.ranking(span=pixiv.span.daily),
     pixiv.ranking_log.days_ago(1),
-    pixiv.ranking_log.days_ago(2)))
+    pixiv.ranking_log.days_ago(2))))
 
 folders = [
     Folder(
