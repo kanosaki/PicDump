@@ -1,7 +1,7 @@
 import datetime
 import threading
 
-from picdump.enum import Enum
+from enum import Enum
 
 IMMEDIATE_RUN_THRESH = 1  # 1 second
 
