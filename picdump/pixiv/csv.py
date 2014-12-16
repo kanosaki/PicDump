@@ -49,7 +49,7 @@ class CSVRow:
         self.cells = [c.strip('"') for c in line.split(delimiter)]
 
     def __getattr__(self, key):
-        if not key in self.CELLS:
+        if key not in self.CELLS:
             raise AttributeError()
         else:
             col = self.CELLS[key]
@@ -60,6 +60,9 @@ class CSVRow:
 
     def __contains__(self, key):
         return key in self.CELLS
+
+    def __str__(self):
+        return "Row({})".format(str(self.cells))
 
 
 class CSVReader:
@@ -81,6 +84,3 @@ class CSVReader:
 
     def parse_row(self, line):
         pass
-
-
-
