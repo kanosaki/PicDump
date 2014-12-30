@@ -63,8 +63,9 @@ class Updater(scheduler.Worker):
                  interval=DEFAULT_UPDATE_INTERVAL,
                  clear_dir=True,
                  source_reset=True,
-                 size=50):
-        super().__init__(interval)
+                 size=50,
+                 repeat=True):
+        super().__init__(interval, repeat=repeat)
         self.folder_clear = clear_dir
         self.source_reset = source_reset
         self.size = size
